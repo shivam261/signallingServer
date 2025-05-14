@@ -23,7 +23,7 @@ io.on('connection', (socket) => {
   socket.on('join-room',data=>{
     
     const {roomId, emailId}=data;
-    console.log('a user connected',roomId , emailId);
+    //console.log('a user connected',roomId , emailId);
     emialToSocketMapping.set(emailId, socket.id);
     socketToEmailMapping.set(socket.id, emailId);
     socket.join(roomId);
@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
     const {emailId,offer}=data;
     const fromEmailId=socketToEmailMapping.get(socket.id);
     const socketId=emialToSocketMapping.get(emailId);
-    console.log(fromEmailId)
+    //console.log(fromEmailId)
       socket.to(socketId).emit('incoming-call',{
         from:fromEmailId,
         offer,})
@@ -42,8 +42,24 @@ io.on('connection', (socket) => {
   socket.on("call-accepted",data=>{
     const {emailId, ans}=data;
     const socketId=emialToSocketMapping.get(emailId);
-    console.log("call accepted",emailId, ans);
+    //console.log("call accepted",emailId, ans);
     socket.to(socketId).emit('call-accepted',{ans});
   }
   )
+  socket.on("textsent",data=>{
+    const {emailId, text,roomId}=data;
+    const socketId=emialToSocketMapping.get(emailId);
+    console.log("text sent",emailId, text);
+    console.log("socketId",socketId);
+    console.log("roomId",roomId);
+    socket.to(roomId).emit('textreceived',{text});
+  })
+  socket.on('predictedText',data=>{
+    const { text,roomId}=data;
+    const socketId=emialToSocketMapping.get(emailId);
+    console.log("predictedText",emailId, text);
+    console.log("socketId",socketId);
+    console.log("roomId",roomId);
+    socket.to(roomId).emit('predictedTextReceived',{text});
+  })
 });
